@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Roleta de Prêmios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      color: #c62828;
+    }
+
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 50px solid red;
+      margin: 20px auto -30px auto;
+    }
+
+    #wheel {
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      border: 10px solid #333;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      transform: rotate(0deg);
+      transition: transform 5s ease-out;
+    }
+
+    .segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      transform-origin: 100% 100%;
+      background-color: #eee;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      color: black;
+      font-size: 12px;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: green;
+    }
+
+    #gerar {
+      background-color: #0277bd;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #sortear {
+      background-color: #388e3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 Roleta de Prêmios 🎉</h1>
+
+  <button id="gerar" onclick="gerarCodigo()">Gerar Meu Código</button><br>
+  <input type="text" id="codigo" placeholder="Digite seu código do bilhete" />
+  <button id="sortear" onclick="girarRoleta()">Girar</button>
+
+  <div id="pointer"></div>
+  <div id="wheel"></div>
+  <div id="result"></div>
+
+  <script>
+    const premios = [
+      "Copo Stanley",
+      "BONÉS",
+      "MOCHILA",
+      "MALA DE VIAGEM",
+      "BOLA COMEMBOL LIBERTADORES",
+      "KIT CANETAS",
+      "GARRAFAS",
+      "NÃO FOI DESTA VEZ"
+    ];
+
+    const wheel = document.getElementById("wheel");
+
+    function desenharRoda() {
+      premios.forEach((premio, i) => {
+        const deg = i * (360 / premios.length);
+        const segment = document.createElement("div");
+        segment.className = "segment";
+        segment.style.transform = rotate(${deg}deg) skewY(-45deg);
+        segment.style.background = hsl(${deg}, 80%, 85%);
+        segment.innerHTML = <div style="transform: skewY(45deg) rotate(${(360 / premios.length) / 2}deg); position:absolute; top:50%; left:100%; width:200px;">${premio}</div>;
+        wheel.appendChild(segment);
+      });
+    }
+
+    desenharRoda();
+
+    function gerarCodigo() {
+      const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const letra = letras[Math.floor(Math.random() * letras.length)];
+      const numero = Math.floor(1000 + Math.random() * 9000);
+      const codigo = BILHETE-${letra}${numero};
+      alert("Seu código: " + codigo);
+    }
+
+    function girarRoleta() {
+      const codigo = document.getElementById("codigo").value.trim().toUpperCase();
+      if (!codigo || !codigo.startsWith("BILHETE-")) {
+        alert("Insira um código válido!");
+        return;
+      }
+
+      const usados = JSON.parse(localStorage.getItem("codigosUsados") || "[]");
+
+      if (usados.includes(codigo)) {
+        alert("Este código já foi usado!");
+        return;
+      }
+
+      const totalSetores = premios.length;
+      const setorSorteado = Math.floor(Math.random() * totalSetores);
+      const anguloPorSetor = 360 / totalSetores;
+      const rotacaoFinal = 3600 + (setorSorteado * anguloPorSetor) + (anguloPorSetor / 2);
+
+      wheel.style.transition = "transform 5s ease-out";
+      wheel.style.transform = rotate(${rotacaoFinal}deg);
+
+      usados.push(codigo);
+      localStorage.setItem("codigosUsados", JSON.stringify(usados));
+
+      setTimeout(() => {
+        document.getElementById("result").innerText = 🎁 Você ganhou: ${premios[setorSorteado]}!;
+      }, 5200);
+    }
+  </script>
+</body>
+</html>
